@@ -53,21 +53,21 @@ export function ListaComprasDialog({ open, itens, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-3 sm:items-center">
-      <Card className="w-full max-w-3xl p-4">
-        <div className="flex items-start justify-between gap-3">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-3 sm:items-center print:relative print:inset-auto print:z-auto print:bg-transparent print:p-0">
+      <Card className="w-full max-w-3xl p-4 print:max-w-none print:border-0 print:shadow-none">
+        <div className="flex items-start justify-between gap-3 print:block">
           <div>
-            <div className="text-lg font-semibold">Lista de compras</div>
+            <div className="text-lg font-semibold">📋 Lista de compras</div>
             <div className="mt-1 text-sm text-slate-600">
               Gerada automaticamente com base no seu estoque.
             </div>
           </div>
-          <Button type="button" variant="ghost" onClick={onClose}>
-            Fechar
+          <Button type="button" variant="secondary" onClick={onClose} className="print:hidden">
+            ✕ Fechar
           </Button>
         </div>
 
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between print:hidden">
           <label className="flex select-none items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
             <input
               type="checkbox"
@@ -80,21 +80,21 @@ export function ListaComprasDialog({ open, itens, onClose }: Props) {
           <div className="flex gap-2">
             <Button
               type="button"
-              variant="secondary"
+              variant="primary"
               onClick={copiar}
               disabled={itensParaComprar.length === 0}
               title="Copia em formato de texto"
             >
-              {copiado ? 'Copiado!' : 'Copiar'}
+              {copiado ? '✓ Copiado!' : '📋 Copiar'}
             </Button>
             <Button
               type="button"
-              variant="secondary"
+              variant="primary"
               onClick={() => window.print()}
               disabled={itensParaComprar.length === 0}
               title="Abre o diálogo de impressão do navegador"
             >
-              Imprimir
+              🖨️ Imprimir
             </Button>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function ListaComprasDialog({ open, itens, onClose }: Props) {
 
           {/* Para copiar manualmente caso clipboard falhe */}
           {itensParaComprar.length > 0 ? (
-            <div className="mt-3">
+            <div className="mt-3 print:hidden">
               <div className="mb-1 text-xs font-medium text-slate-700">
                 Texto (para copiar/colar)
               </div>

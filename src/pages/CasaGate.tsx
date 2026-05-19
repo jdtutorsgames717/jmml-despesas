@@ -75,11 +75,14 @@ export default function CasaGate({
   }, [session.user.id])
 
   const selecionar = (id: string) => {
+    console.log('[selecionar] Selecionando casa:', id)
     try {
       localStorage.setItem(STORAGE_KEY_CASA_ATUAL, id)
-    } catch {
-      // ignore
+      console.log('[selecionar] Salvo no localStorage')
+    } catch (e) {
+      console.error('[selecionar] Erro ao salvar no localStorage:', e)
     }
+    console.log('[selecionar] Chamando onReady com id:', id)
     onReady(id)
   }
 
@@ -89,20 +92,29 @@ export default function CasaGate({
     setLoading(true)
     try {
       const codigo = gerarCodigoConvite()
+      console.log('[criarCasa] Criando casa com código:', codigo)
+      
       const { data: casa, error: errCasa } = await sb
         .from('cas')
         .insert({ nome: casaNome.trim(), codigo_convite: codigo })
         .select('id')
         .single()
+      
+      console.log('[criarCasa] Resultado da criação:', { casa, errCasa })
       if (errCasa) throw errCasa
 
-      const { error: errJoin } = await sb.rpc('entrar_na_casa', {
+      console.log('[criarCasa] Entrando na casa com código:', codigo)
+      const { data: casaIdRetornado, error: errJoin } = await sb.rpc('entrar_na_casa', {
         _codigo_convite: codigo,
       })
+      
+      console.log('[criarCasa] Resultado de entrar_na_casa:', { casaIdRetornado, errJoin })
       if (errJoin) throw errJoin
 
+      console.log('[criarCasa] Selecionando casa:', casa.id)
       selecionar(casa.id)
     } catch (e: any) {
+      console.error('[criarCasa] Erro:', e)
       setErro(e?.message ?? 'Falha ao criar casa.')
     } finally {
       setLoading(false)

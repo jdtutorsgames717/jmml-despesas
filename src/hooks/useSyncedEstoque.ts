@@ -92,7 +92,7 @@ export function useSyncedEstoque(casaId: string) {
 
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [casaId, storageKeyItens(casaId)])
+  }, [casaId, sb])
 
   // Envia mudanças para o Supabase (debounce)
   useEffect(() => {
@@ -142,7 +142,7 @@ export function useSyncedEstoque(casaId: string) {
     return () => {
       if (debounceRef.current) window.clearTimeout(debounceRef.current)
     }
-  }, [itens, casaId])
+  }, [itens, casaId, sb])
 
   const info = useMemo(() => status, [status])
   return { itens, actions, syncStatus: info }

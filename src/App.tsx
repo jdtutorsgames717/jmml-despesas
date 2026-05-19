@@ -23,20 +23,12 @@ function LocalApp() {
   return <EstoquePage itens={itens} actions={actions} />
 }
 
-function SupabaseApp() {
-  const { session, loading } = useSession()
-  const [casaId, setCasaId] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!session) setCasaId(null)
-  }, [session])
-
-  if (loading) return <Loading />
-  if (!session) return <AuthPage />
-  if (!casaId) return <CasaGate session={session} onReady={setCasaId} />
-
+function SyncedEstoquePage({ casaId }: { casaId: string }) {
+  console.log('[SyncedEstoquePage] Renderizando com casaId:', casaId)
+  
   const { itens, actions, syncStatus } = useSyncedEstoque(casaId)
-
+  console.log('[SyncedEstoquePage] Hook executado com sucesso', { itens, syncStatus })
+  
   return (
     <EstoquePage
       casaId={casaId}
@@ -46,6 +38,39 @@ function SupabaseApp() {
       onSignOut={() => supabase?.auth.signOut()}
     />
   )
+}
+
+function SupabaseApp() {
+  const { session, loading } = useSession()
+  const [casaId, setCasaId] = useState<string | null>(null)
+
+  console.log('[SupabaseApp] Estado:', { session: !!session, loading, casaId })
+
+  useEffect(() => {
+    if (!session) {
+      console.log('[SupabaseApp] Sem sessão, limpando casaId')
+      setCasaId(null)
+    }
+  }, [session])
+
+  if (loading) {
+    console.log('[SupabaseApp] Renderizando Loading')
+    return <Loading />
+  }
+  if (!session) {
+    console.log('[SupabaseApp] Renderizando AuthPage')
+    return <AuthPage />
+  }
+  if (!casaId) {
+    console.log('[SupabaseApp] Renderizando CasaGate')
+    return <CasaGate session={session} onReady={(id) => {
+      console.log('[SupabaseApp] onReady chamado com id:', id)
+      setCasaId(id)
+    }} />
+  }
+  
+  console.log('[SupabaseApp] Renderizando SyncedEstoquePage com casaId:', casaId)
+  return <SyncedEstoquePage casaId={casaId} />
 }
 
 export default function App() {

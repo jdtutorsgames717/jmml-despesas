@@ -136,11 +136,11 @@ export default function EstoquePage({
             {onSignOut ? (
               <Button
                 type="button"
-                variant="ghost"
+                variant="secondary"
                 className="flex-1 sm:flex-none"
                 onClick={onSignOut}
               >
-                Sair
+                🚪 Sair
               </Button>
             ) : null}
             <Button
@@ -149,7 +149,7 @@ export default function EstoquePage({
               className="flex-1 sm:flex-none"
               onClick={() => setListaComprasOpen(true)}
             >
-              Lista de compras
+              📋 Lista de compras
             </Button>
             <Button
               type="button"

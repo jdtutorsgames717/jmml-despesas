@@ -8,7 +8,7 @@ type Props = {
 }
 
 function Numero({ value }: { value: number }) {
-  return <div className="text-3xl font-semibold tracking-tight">{value}</div>
+  return <div className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">{value}</div>
 }
 
 export function Dashboard({
@@ -20,7 +20,7 @@ export function Dashboard({
   return (
     <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       <Card className="p-4">
-        <div className="text-sm text-slate-600">Total de itens</div>
+        <div className="text-sm text-slate-600 dark:text-slate-400">Total de itens</div>
         <Numero value={totalItens} />
       </Card>
 
@@ -34,14 +34,14 @@ export function Dashboard({
         <Card
           className={`p-4 transition ${
             onClickEstoqueBaixo
-              ? 'cursor-pointer hover:border-indigo-300 hover:shadow-sm focus-within:ring-2 focus-within:ring-indigo-500'
+              ? 'cursor-pointer hover:border-indigo-300 hover:shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 dark:hover:border-indigo-600'
               : ''
           }`}
         >
           <div className="flex items-center justify-between gap-3">
-            <div className="text-sm text-slate-600">Estoque baixo (&lt; 2)</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400">Estoque baixo (&lt; 2)</div>
             {onClickEstoqueBaixo ? (
-              <span className="text-xs font-medium text-indigo-700">Ver</span>
+              <span className="text-xs font-medium text-indigo-700 dark:text-indigo-400">Ver</span>
             ) : null}
           </div>
           <Numero value={itensComEstoqueBaixo} />
@@ -49,7 +49,7 @@ export function Dashboard({
       </button>
 
       <Card className="p-4">
-        <div className="text-sm text-slate-600">Monitorados</div>
+        <div className="text-sm text-slate-600 dark:text-slate-400">Monitorados</div>
         <Numero value={itensMonitorados} />
       </Card>
     </section>

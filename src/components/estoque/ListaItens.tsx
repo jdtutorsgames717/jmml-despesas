@@ -81,9 +81,9 @@ export function ListaItens({ itens, onEditar, onRemover, onDeltaQuantidade }: Pr
   return (
     <section className="space-y-3">
       {/* Tabela (desktop) */}
-      <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm md:block">
+      <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800 md:block">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:bg-slate-700 dark:text-slate-300">
             <tr>
               <th className="px-4 py-3">Produto</th>
               <th className="px-4 py-3">Categoria</th>
@@ -101,7 +101,7 @@ export function ListaItens({ itens, onEditar, onRemover, onDeltaQuantidade }: Pr
               return (
                 <tr key={item.id} className="align-top">
                   <td className="px-4 py-3">
-                    <div className="font-medium text-slate-900">{item.nome}</div>
+                    <div className="font-medium text-slate-900 dark:text-slate-100">{item.nome}</div>
                     <div className="mt-1 flex flex-wrap gap-2">
                       {item.monitorado ? (
                         <Badge tone="slate">Monitorado</Badge>

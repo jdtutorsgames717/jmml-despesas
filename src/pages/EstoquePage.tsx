@@ -147,7 +147,10 @@ export default function EstoquePage({
               type="button"
               variant="secondary"
               className="flex-1 sm:flex-none"
-              onClick={() => setListaComprasOpen(true)}
+              onClick={() => {
+                const url = `/lista-compras?casaId=${casaId || ''}`
+                window.open(url, '_blank')
+              }}
             >
               📋 Lista de compras
             </Button>

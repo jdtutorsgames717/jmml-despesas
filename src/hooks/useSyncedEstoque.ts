@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ItemEstoque } from '../domain/estoque'
-import { storageKeyItens } from '../domain/estoque'
 import { supabase } from '../lib/supabaseClient'
 import { useEstoque } from './useEstoque'
 
@@ -54,16 +53,23 @@ export function useSyncedEstoque(casaId: string) {
   // Carrega remoto e faz merge (última alteração vence)
   useEffect(() => {
     const load = async () => {
-      if (!sb) return
+      console.log('[useSyncedEstoque] Carregando dados remotos', { sb: !!sb, casaId })
+      if (!sb) {
+        console.log('[useSyncedEstoque] Supabase não configurado')
+        return
+      }
       setStatus({ state: 'syncing' })
       try {
+        console.log('[useSyncedEstoque] Fazendo select no Supabase')
         const { data, error } = await sb
           .from('estoque_itens')
           .select('*')
           .eq('casa_id', casaId)
 
+        console.log('[useSyncedEstoque] Resultado do select:', { data, error })
         if (error) throw error
         const remotos = (data ?? []).map(mapFromDb)
+        console.log('[useSyncedEstoque] Itens remotos mapeados:', remotos)
 
         // Merge por id + atualizadoEm
         const byId = new Map<string, ItemEstoque>()
@@ -80,13 +86,17 @@ export function useSyncedEstoque(casaId: string) {
         }
 
         const merged = Array.from(byId.values())
+        console.log('[useSyncedEstoque] Itens após merge:', merged)
         setItens(merged)
         prevIdsRef.current = new Set(merged.map((x) => x.id))
         loadedRef.current = true
+        console.log('[useSyncedEstoque] loadedRef.current = true')
         setStatus({ state: 'idle' })
       } catch (e: any) {
+        console.error('[useSyncedEstoque] Erro ao carregar:', e)
         setStatus({ state: 'error', message: e?.message ?? 'Falha ao sincronizar.' })
         loadedRef.current = true // evita travar; seguimos com localStorage
+        console.log('[useSyncedEstoque] loadedRef.current = true (após erro)')
       }
     }
 
@@ -96,12 +106,31 @@ export function useSyncedEstoque(casaId: string) {
 
   // Envia mudanças para o Supabase (debounce)
   useEffect(() => {
-    if (!sb) return
-    if (!loadedRef.current) return
+    console.log('[useSyncedEstoque] useEffect sync - início', { 
+      sb: !!sb, 
+      loadedRef: loadedRef.current, 
+      itensLength: itens.length,
+      casaId 
+    })
+    
+    if (!sb) {
+      console.log('[useSyncedEstoque] Supabase não configurado, pulando sync')
+      return
+    }
+    if (!loadedRef.current) {
+      console.log('[useSyncedEstoque] loadedRef.current é false, pulando sync')
+      return
+    }
 
     const currentIds = new Set(itens.map((x) => x.id))
     const prevIds = prevIdsRef.current
     const deletedIds = [...prevIds].filter((id) => !currentIds.has(id))
+
+    console.log('[useSyncedEstoque] Preparando sync', { 
+      currentIds: Array.from(currentIds), 
+      prevIds: Array.from(prevIds), 
+      deletedIds 
+    })
 
     // atualiza o "snapshot" de ids, para o próximo ciclo
     prevIdsRef.current = currentIds
@@ -109,27 +138,42 @@ export function useSyncedEstoque(casaId: string) {
     if (debounceRef.current) window.clearTimeout(debounceRef.current)
 
     debounceRef.current = window.setTimeout(async () => {
+      console.log('[useSyncedEstoque] Iniciando sync após debounce')
       setStatus({ state: 'syncing' })
       try {
         if (itens.length > 0) {
           const rows = itens.map((i) => mapToDb(casaId, i))
+          console.log('[useSyncedEstoque] Enviando upsert', { rows })
+          
           const { error } = await sb
             .from('estoque_itens')
             .upsert(rows, { onConflict: 'id' })
-          if (error) throw error
+          
+          if (error) {
+            console.error('[useSyncedEstoque] Erro no upsert:', error)
+            throw error
+          }
+          console.log('[useSyncedEstoque] Upsert bem-sucedido')
         }
 
         if (deletedIds.length > 0) {
+          console.log('[useSyncedEstoque] Deletando itens:', deletedIds)
           const { error } = await sb
             .from('estoque_itens')
             .delete()
             .eq('casa_id', casaId)
             .in('id', deletedIds)
-          if (error) throw error
+          if (error) {
+            console.error('[useSyncedEstoque] Erro no delete:', error)
+            throw error
+          }
+          console.log('[useSyncedEstoque] Delete bem-sucedido')
         }
 
         setStatus({ state: 'idle' })
+        console.log('[useSyncedEstoque] Sync completo')
       } catch (e: any) {
+        console.error('[useSyncedEstoque] Erro durante sync:', e)
         setStatus({
           state: 'error',
           message:

@@ -10,6 +10,7 @@ import { ListaComprasDialog } from '../components/estoque/ListaComprasDialog'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { useCasa } from '../hooks/useCasa'
+import { useDarkMode } from '../hooks/useDarkMode'
 
 type SyncStatus = ReturnType<typeof useSyncedEstoque>['syncStatus']
 
@@ -62,6 +63,7 @@ export default function EstoquePage({
   onSignOut,
 }: Props) {
   const { casa } = useCasa(casaId ?? null)
+  const { isDark, toggle } = useDarkMode()
 
   const [busca, setBusca] = useState('')
   const [categoria, setCategoria] = useState<Categoria | 'Todas'>('Todas')
@@ -113,18 +115,18 @@ export default function EstoquePage({
   }
 
   return (
-    <div className="min-h-svh">
-      <header className="border-b border-slate-200 bg-white">
+    <div className="min-h-svh bg-slate-50 dark:bg-slate-900">
+      <header className="border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4">
           <div>
-            <h1 className="text-lg font-semibold leading-tight text-slate-900 sm:text-xl">
+            <h1 className="text-lg font-semibold leading-tight text-slate-900 dark:text-slate-100 sm:text-xl">
               Controle de Estoque Doméstico
             </h1>
-            <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-slate-600">
+            <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
               <span>Dados salvos automaticamente.</span>
               <StatusSync status={syncStatus} />
               {casa ? (
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700 dark:bg-slate-700 dark:text-slate-300">
                   Casa: <span className="font-semibold">{casa.nome}</span> • Código:{' '}
                   <span className="font-mono">{casa.codigo_convite}</span>
                 </span>
@@ -133,6 +135,15 @@ export default function EstoquePage({
           </div>
 
           <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+            <Button
+              type="button"
+              variant="ghost"
+              className="flex-1 sm:flex-none"
+              onClick={toggle}
+              title="Alternar tema"
+            >
+              {isDark ? '☀️' : '🌙'}
+            </Button>
             {onSignOut ? (
               <Button
                 type="button"
